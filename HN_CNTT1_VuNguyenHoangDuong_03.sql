@@ -62,7 +62,8 @@ INSERT INTO appointments (appointment_id, patient_id, doctor_id, department_id, 
 ("2","P002","D002","DP02","2025-10-02","Completed"),
 ("3","P003","D003","DP03","2025-10-03","Pending"),
 ("4","P004","D004","DP04","2025-10-04","Cancelled"),
-("5","P005","D005","DP05","2025-10-05","Completed");
+("5","P005","D005","DP05","2025-10-05","Completed"),
+("6","P005","D005","DP05","2025-10-05","Completed");
 -- Cập nhật thông tin bệnh nhân
 UPDATE patients SET patient_phone = "096536868" WHERE patient_id = "P003";
 -- Cập nhật thông tin bệnh nhân
@@ -72,7 +73,7 @@ DELETE FROM appointments WHERE appointment_status = "Cancelled" AND appointment_
 --  Liệt kê danh sách lịch hẹn
 SELECT * FROM appointments WHERE appointment_status = "Completed" AND appointment_date > "2025-10-01";
 -- Lấy thông tin 
-SELECT * FROM patients WHERE patient_phone HAVING "09";
+SELECT patient_full_name, patient_phone, patient_gender FROM patients WHERE patient_phone like "09%";
 -- Hiển thị danh sách tất cả các lịch hẹn giảm dần
 SELECT appointment_id,patient_id,appointment_date FROM appointments ORDER BY appointment_date DESC;
 -- Lấy 3 bản ghi đầu tiên
@@ -90,12 +91,18 @@ SELECT d.doctor_id, d.doctor_full_name ,a.appointment_id
 FROM appointments a
 JOIN doctors d ON a.doctor_id = d.doctor_id;
 -- Tính tổng số lịch hẹn
-SELECT appointment_status
-
+SELECT appointment_status, COUNT(*) AS Total_Appointment
+FROM appointments GROUP BY appointment_status HAVING COUNT(*);
 -- Thống kê số lượng lịch hẹn của mỗi bệnh nhân
-
+SELECT patient_id , COUNT(*) AS Count_Appointment
+FROM appointments GROUP BY  patient_id HAVING COUNT(*) >= 2;
 -- Lấy thông tin các lịch hẹn muộn hơn ngày hẹn trung bình của tất cả các lịch hẹn
-
+SELECT appointment_id, appointment_date, doctor_id
+FROM appointments
+WHERE appointment_date > (
+    SELECT AVG(appointment_date)
+    FROM appointments
+);
 -- Hiển thị patient_full_name và patient_phone của những bệnh nhân đã từng khám tại khoa có department_name là “Khoa nội”
 SELECT patient_full_name ,patient_phone,department_name
 FROM appointments a
